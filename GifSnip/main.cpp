@@ -28,7 +28,7 @@ enum class GifRecordingStatus
 
 winrt::IAsyncOperation<winrt::StorageFile> CreateOutputFile();
 
-int __stdcall wmain(int argc, wchar_t* argv[])
+int __stdcall wmain()
 {
     winrt::check_bool(SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2));
 
