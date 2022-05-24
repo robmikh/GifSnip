@@ -22,6 +22,9 @@
 #include <winrt/Windows.Graphics.Capture.h>
 #include <winrt/Windows.Graphics.DirectX.h>
 #include <winrt/Windows.Graphics.DirectX.Direct3d11.h>
+#include <winrt/Windows.Graphics.Imaging.h>
+#include <winrt/Windows.Storage.h>
+#include <winrt/Windows.Storage.Streams.h>
 
 // WIL
 #include <wil/resource.h>
@@ -39,6 +42,7 @@
 #include <memory>
 #include <algorithm>
 #include <mutex>
+#include <filesystem>
 
 // robmikh.common
 #include <robmikh.common/composition.interop.h>

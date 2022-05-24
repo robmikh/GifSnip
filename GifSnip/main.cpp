@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "DisplaysUtil.h"
 #include "MainWindow.h"
+#include "CaptureGifEncoder.h"
 
 namespace winrt
 {
@@ -9,6 +10,7 @@ namespace winrt
     using namespace Windows::UI;
     using namespace Windows::UI::Composition;
     using namespace Windows::Graphics::Capture;
+    using namespace Windows::Storage;
 }
 
 namespace util
@@ -24,12 +26,14 @@ enum class GifRecordingStatus
     Ended,
 };
 
+winrt::IAsyncOperation<winrt::StorageFile> CreateOutputFile();
+
 int __stdcall wmain(int argc, wchar_t* argv[])
 {
     winrt::check_bool(SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2));
 
     // Initialize COM
-    winrt::init_apartment(winrt::apartment_type::single_threaded);
+    winrt::init_apartment(winrt::apartment_type::multi_threaded);
 
     // Create the DispatcherQueue that the compositor needs to run
     auto controller = util::CreateDispatcherQueueControllerForCurrentThread();
@@ -38,9 +42,11 @@ int __stdcall wmain(int argc, wchar_t* argv[])
     auto compositor = winrt::Compositor();
 
     // Initialize D3D
-    auto d3dDevice = util::CreateD3DDevice();
-    winrt::com_ptr<ID3D11DeviceContext> d3dContext;
-    d3dDevice->GetImmediateContext(d3dContext.put());
+    uint32_t flags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+#ifdef _DEBUG
+    flags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+    auto d3dDevice = util::CreateD3DDevice(flags);
 
     // Create our window
     auto window = MainWindow(compositor);
@@ -52,6 +58,7 @@ int __stdcall wmain(int argc, wchar_t* argv[])
     window.Show();
     wprintf(L"Drag to select an area of the screen to record...\n");
     auto gifStatus = GifRecordingStatus::None;
+    auto encoder = std::make_unique<CaptureGifEncoder>(d3dDevice);
 
     // Message pump
     MSG msg = {};
@@ -93,12 +100,13 @@ int __stdcall wmain(int argc, wchar_t* argv[])
                     }
 
                     winrt::GraphicsCaptureItem item{ nullptr };
-                    RECT captureRect = snipRect;
+                    RECT captureRect = {};
                     if (containingDisplay.has_value())
                     {
                         auto display = containingDisplay.value();
                         item = util::CreateCaptureItemForMonitor(display.Handle());
                         auto displayRect = display.Rect();
+                        captureRect = snipRectInDesktopSpace;
                         captureRect.left -= displayRect.left;
                         captureRect.top -= displayRect.top;
                         captureRect.right -= displayRect.left;
@@ -107,16 +115,20 @@ int __stdcall wmain(int argc, wchar_t* argv[])
                     else
                     {
                         item = util::CreateCaptureItemForMonitor(nullptr);
+                        captureRect = snipRect;
                     }
 
-                    // TODO: Start gif recording
+                    // Start gif recording
+                    auto file = CreateOutputFile().get();
+                    encoder->Start(item, captureRect, file);
                     gifStatus = GifRecordingStatus::Started;
                     wprintf(L"Press CTRL+SHIFT+R to stop recording...\n");
                 }
                 break;
                 case GifRecordingStatus::Started:
                 {
-                    // TODO: Stop gif recording
+                    // Stop gif recording
+                    encoder->Stop();
                     gifStatus = GifRecordingStatus::Ended;
                     wprintf(L"Done!\n");
                     PostQuitMessage(0);
@@ -131,4 +143,12 @@ int __stdcall wmain(int argc, wchar_t* argv[])
         DispatchMessageW(&msg);
     }
     return util::ShutdownDispatcherQueueControllerAndWait(controller, static_cast<int>(msg.wParam));
+}
+
+winrt::IAsyncOperation<winrt::StorageFile> CreateOutputFile()
+{
+    auto currentPath = std::filesystem::current_path();
+    auto folder = co_await winrt::StorageFolder::GetFolderFromPathAsync(currentPath.wstring());
+    auto file = co_await folder.CreateFileAsync(L"recording.gif", winrt::CreationCollisionOption::ReplaceExisting);
+    co_return file;
 }
