@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "DisplaysUtil.h"
 #include "MainWindow.h"
 
 namespace winrt
@@ -17,25 +18,6 @@ namespace util
 const std::wstring MainWindow::ClassName = L"GifSnip.MainWindow";
 const float MainWindow::BorderThickness = 5;
 std::once_flag MainWindowClassRegistration;
-
-RECT ComputeAllDisplaysUnion()
-{
-    RECT result = {};
-    result.left = LONG_MAX;
-    result.top = LONG_MAX;
-    result.right = LONG_MIN;
-    result.bottom = LONG_MIN;
-    auto infos = util::DisplayInfo::GetAllDisplays();
-    for (auto&& info : infos)
-    {
-        auto rect = info.Rect();
-        result.left = std::min(result.left, rect.left);
-        result.top = std::min(result.top, rect.top);
-        result.right = std::max(result.right, rect.right);
-        result.bottom = std::max(result.bottom, rect.bottom);
-    }
-    return result;
-}
 
 void MainWindow::RegisterWindowClass()
 {

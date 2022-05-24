@@ -1,4 +1,5 @@
 ﻿#include "pch.h"
+#include "DisplaysUtil.h"
 #include "MainWindow.h"
 
 namespace winrt
@@ -7,6 +8,7 @@ namespace winrt
     using namespace Windows::Foundation::Numerics;
     using namespace Windows::UI;
     using namespace Windows::UI::Composition;
+    using namespace Windows::Graphics::Capture;
 }
 
 namespace util
@@ -63,6 +65,50 @@ int __stdcall wmain(int argc, wchar_t* argv[])
                 {
                 case GifRecordingStatus::None:
                 {
+                    // Transform the snip rect into desktop space
+                    auto displays = util::DisplayInfo::GetAllDisplays();
+                    auto unionRect = ComputeAllDisplaysUnion(displays);
+                    auto snipRect = window.GetSnipRect();
+                    auto snipRectInDesktopSpace = snipRect;
+                    snipRectInDesktopSpace.left += unionRect.left;
+                    snipRectInDesktopSpace.top += unionRect.top;
+                    snipRectInDesktopSpace.right += unionRect.left;
+                    snipRectInDesktopSpace.bottom += unionRect.top;
+
+                    // If our snip rect is wholly within a display rect,
+                    // we can capture just that one display instead of 
+                    // all displays.
+                    std::optional<util::DisplayInfo> containingDisplay = std::nullopt;
+                    for (auto&& display : displays)
+                    {
+                        auto displayRect = display.Rect();
+                        if (displayRect.left <= snipRectInDesktopSpace.left &&
+                            displayRect.top <= snipRectInDesktopSpace.top &&
+                            displayRect.right >= snipRectInDesktopSpace.right &&
+                            displayRect.bottom >= snipRectInDesktopSpace.bottom)
+                        {
+                            containingDisplay = std::optional(display);
+                            break;
+                        }
+                    }
+
+                    winrt::GraphicsCaptureItem item{ nullptr };
+                    RECT captureRect = snipRect;
+                    if (containingDisplay.has_value())
+                    {
+                        auto display = containingDisplay.value();
+                        item = util::CreateCaptureItemForMonitor(display.Handle());
+                        auto displayRect = display.Rect();
+                        captureRect.left -= displayRect.left;
+                        captureRect.top -= displayRect.top;
+                        captureRect.right -= displayRect.left;
+                        captureRect.bottom -= displayRect.top;
+                    }
+                    else
+                    {
+                        item = util::CreateCaptureItemForMonitor(nullptr);
+                    }
+
                     // TODO: Start gif recording
                     gifStatus = GifRecordingStatus::Started;
                     wprintf(L"Press CTRL+SHIFT+R to stop recording...\n");
