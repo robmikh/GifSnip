@@ -15,29 +15,13 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|ARM">
-      <Configuration>Debug</Configuration>
-      <Platform>ARM</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|ARM64">
       <Configuration>Debug</Configuration>
       <Platform>ARM64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|ARM">
-      <Configuration>Release</Configuration>
-      <Platform>ARM</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|ARM64">
       <Configuration>Release</Configuration>
       <Platform>ARM64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
@@ -91,18 +75,16 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">stdcpp17</LanguageStandard>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">stdcpp17</LanguageStandard>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">stdcpp17</LanguageStandard>
+      <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
-    <FxCompile>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-      </ShaderModel>
-    </FxCompile>
+    <FxCompile />
     <FxCompile>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
       </ShaderModel>
@@ -112,26 +94,16 @@
       </ShaderModel>
     </FxCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Platform)'=='Win32'">
-    <ClCompile>
-      <PreprocessorDefinitions>WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdcpp17</LanguageStandard>
-    </ClCompile>
-    <FxCompile>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ShaderModel>
-    </FxCompile>
-  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">stdcpp17</LanguageStandard>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">stdcpp17</LanguageStandard>
-      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdcpp17</LanguageStandard>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdcpp17</LanguageStandard>
+      <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,18 +111,12 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
-    <FxCompile>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-      </ShaderModel>
-    </FxCompile>
+    <FxCompile />
     <FxCompile>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
       </ShaderModel>
     </FxCompile>
-    <FxCompile>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </ShaderModel>
-    </FxCompile>
+    <FxCompile />
     <FxCompile>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ShaderModel>
@@ -180,39 +146,19 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="TextureDiff.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">5.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Compute</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">5.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Compute</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(GeneratedFilesDir)%(Filename)Shader.h</HeaderFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(GeneratedFilesDir)%(Filename)Shader.h</HeaderFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </ObjectFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">$(GeneratedFilesDir)%(Filename)Shader.h</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
       </ObjectFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">$(GeneratedFilesDir)%(Filename)Shader.h</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-      </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(GeneratedFilesDir)%(Filename)Shader.h</HeaderFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-      </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(GeneratedFilesDir)%(Filename)Shader.h</HeaderFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
       </ObjectFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(GeneratedFilesDir)%(Filename)Shader.h</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
